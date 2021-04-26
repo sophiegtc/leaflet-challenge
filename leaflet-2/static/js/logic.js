@@ -9,11 +9,11 @@ d3.json(past7days_url).then(function(earthquake_data) {
       zoom: 5
     });
       
-    earthquake_data = earthquake_data.features;
+    earthquake_data = earthquake_data.features.coordinates;
     console.log(earthquake_data);
 
-    tectonicplatesData=techtonic_data.features;
-    console.log(tectonicplatesData);
+    //tectonicplatesData=techtonic_data.features;
+   // console.log(tectonicplatesData);
     for (var i = 0; i < tectonicplatesData.length; i++) {
       var tectonicplates = tectonicplatesData[i].geometry;
 
