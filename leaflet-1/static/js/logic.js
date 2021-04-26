@@ -46,12 +46,31 @@ d3.json(past7days_url).then(function(response) {
 
     L.circle([location.coordinates[1], location.coordinates[0]], {
       fillOpacity: 0.75,
-      color: "grey",
+      color: "#D2D2CD",
       fillColor: color,
       // Adjust radius
       radius: response[i].properties["mag"]*30000
-    }).bindPopup("<h1> size:" +  response[i].properties["mag"] + "</h1> <hr> <h3>deep: " + location.coordinates[2] + "</h3>").addTo(myMap);
+    }).bindPopup("<h2> size:" +  response[i].properties["mag"] + "</h2> <hr> <h3>deep: " + location.coordinates[2] + "</h3>").addTo(myMap);
   }
+
+  // // Set up the legend
+  var legend = L.control({ position: "bottomright" });
+  legend.onAdd = function() {
+    var div = L.DomUtil.create("div", "info legend");
+    var colors = [];
+
+    colors.push("<div><span style=\"background-color: #A3F600;display: inline-block;height: 10px;margin-right: 5px;width: 10px;\"></span>-10-10</div>");
+    colors.push("<div><span style=\"background-color: #DCF400;display: inline-block;height: 10px;margin-right: 5px;width: 10px;\"></span>10-30</div>");
+    colors.push("<div><span style=\"background-color: #F7DB11;display: inline-block;height: 10px;margin-right: 5px;width: 10px;\"></span>30-50</div>");
+    colors.push("<div><span style=\"background-color: #FDB72A;display: inline-block;height: 10px;margin-right: 5px;width: 10px;\"></span>50-70</div>");
+    colors.push("<div><span style=\"background-color: #FCA25D;display: inline-block;height: 10px;margin-right: 5px;width: 10px;\"></span>70-90</div>");
+    colors.push("<div><span style=\"background-color: #FF5F65;display: inline-block;height: 10px;margin-right: 5px;width: 10px;\"></span>90+</div>");
+    div.innerHTML += "<ul>" + colors.join("") + "</ul>";
+    return div;
+  };
+
+  // Adding legend to the map
+  legend.addTo(myMap);
 
    
 });
