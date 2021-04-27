@@ -9,22 +9,29 @@ d3.json(past7days_url).then(function(earthquake_data) {
       zoom: 5
     });
       
-    earthquake_data = earthquake_data.features.coordinates;
+    earthquake_data = earthquake_data.features;
     console.log(earthquake_data);
 
-    //tectonicplatesData=techtonic_data.features;
-   // console.log(tectonicplatesData);
-    for (var i = 0; i < tectonicplatesData.length; i++) {
-      var tectonicplates = tectonicplatesData[i].geometry;
+    var techtonicarray=techtonic_data.features;
+   console.log(techtonicarray);
+
+   var polyLines = [];
+    for (var i = 0; i < techtonicarray.length; i++) {
+      var tectonicplates = techtonicarray[i].geometry.coordinates[0];
 
       var points = [];
-      for (var j = 0; j < tectonicplates.coordinates.length; j++) {
-        points.push([tectonicplates.coordinates[j][1], tectonicplates.coordinates[j][0]]);
+      for (var j = 0; j < tectonicplates.length; j++) {
+        points.push([tectonicplates[j][1], tectonicplates[j][0]]);
       }
-      // console.log(points);
-      L.polyline(points[1]).addTo(myMap);
+    
+      polyLines.push(L.polyline(points, {
+        color: "#D38C05"
+      }));
+      
     }
-
+    //Define arrays to hold earthquakes markers
+    
+    var earthquakeMarkers=[];
     for (var i = 0; i < earthquake_data.length; i++) {
       var location = earthquake_data[i].geometry;
  
@@ -48,19 +55,18 @@ d3.json(past7days_url).then(function(earthquake_data) {
       if (location.coordinates[2] > 90) {
         color = "#FF5F65";
       }
-
-      L.circle([location.coordinates[1], location.coordinates[0]], {
-        fillOpacity: 0.75,
-        color: "#D2D2CD",
-        fillColor: color,
-        // Adjust radius
-        radius: earthquake_data[i].properties["mag"]*30000
-      }).bindPopup("<h2> size:" +  earthquake_data[i].properties["mag"] + "</h2> <hr> <h3>deep: " + location.coordinates[2] + "</h3>").addTo(myMap);
-    }
-    
-    for (var i = 0; i < earthquake_data.length; i++) {
-      var location = earthquake_data[i].geometry;
-
+      earthquakeMarkers.push(
+        L.circle([location.coordinates[1], location.coordinates[0]], {
+          fillOpacity: 0.75,
+          color: "#D2D2CD",
+          fillColor: color,
+          // Adjust radius
+          radius: earthquake_data[i].properties["mag"]*30000
+        }).bindPopup("<h2> size:" +  earthquake_data[i].properties["mag"] + "</h2> <hr> <h3>deep: " + location.coordinates[2] + "</h3>").addTo(myMap)
+      );
+     }
+     var earthquickLayer = L.layerGroup(earthquakeMarkers);  
+     var linesLayer = L.layerGroup(polyLines);
 
       // // Set up the legend
       var legend = L.control({ position: "bottomright" });
@@ -77,48 +83,49 @@ d3.json(past7days_url).then(function(earthquake_data) {
         div.innerHTML += "<ul>" + colors.join("") + "</ul>";
         return div;
       };
-    }
+    
 
     // Adding legend to the map
     legend.addTo(myMap);
     
-    // var Light = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
-    //   attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
-    //   maxZoom: 18,
-    //   id: "light-v10",
-    //   accessToken: API_KEY
-    // });
+    var Light = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
+    attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
+    maxZoom: 18,
+    id: "light-v10",
+    accessToken: API_KEY
+    }).addTo(myMap);
 
-    // var Outdoors = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
-    //   attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
-    //   maxZoom: 18,
-    //   id: "outdoors-v11",
-    //   accessToken: API_KEY
-    // });
+    var Outdoors = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
+    attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
+    maxZoom: 18,
+    id: "outdoors-v11",
+    accessToken: API_KEY
+    }).addTo(myMap);
 
-    // var Satellite = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
-    //   attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
-    //   maxZoom: 18,
-    //   id: "satellite-v9",
-    //   accessToken: API_KEY
-    // });
+    var Satellite = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
+    attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
+    maxZoom: 18,
+    id: "satellite-v9",
+    accessToken: API_KEY
+    }).addTo(myMap);
 
     //   // Create two separate layer groups: one for cities and one for states
     // var states = L.layerGroup(stateMarkers);
     // var cities = L.layerGroup(cityMarkers);
 
-    // // Create a baseMaps object
-    // var baseMaps = {
-    //   "Satellite": Satellite,
-    //   "Outdoors": outdoor,
-    //   "Grayscale":light
-    // };
+    //Create a baseMaps object
+    var baseMaps = {
+      "Satellite": Satellite,
+      "Outdoors": Outdoors,
+      "Grayscale":Light
+    };
 
-    // // Create an overlay object
-    // var overlayMaps = {
-    //   "Tectonic Plates": states,
-    //   "Earthquake": cities
-    // };
+    // Create an overlay object
+    var overlayMaps = {
+      "Tectonic Plates": linesLayer,
+      "Earthquake": earthquickLayer
+    };
+    
 
     // // Define a map object
     // var myMap = L.map("map", {
@@ -129,8 +136,6 @@ d3.json(past7days_url).then(function(earthquake_data) {
 
     // // Pass our map layers into our layer control
     // // Add the layer control to the map
-    // L.control.layers(baseMaps, overlayMaps, {
-    //   collapsed: false
-    // }).addTo(myMap);
+    L.control.layers(baseMaps, overlayMaps).addTo(myMap);
   });
 });
